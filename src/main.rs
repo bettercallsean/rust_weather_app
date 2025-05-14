@@ -63,6 +63,6 @@ fn print_weather(weather: Root) {
         );
     }
 
-    println!("Current temp: {}ºC", weather.main.temp);
-    println!("Feels like: {}ºC", weather.main.feels_like);
+    println!("Current temp: {:.0}ºC", weather.main.temp);
+    println!("Feels like: {:.0}ºC", weather.main.feels_like);
 }
