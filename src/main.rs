@@ -8,7 +8,15 @@ use weather::Root;
 fn main() -> Result<(), Box<dyn Error>> {
     let api_key = get_weather_api_key()?;
 
-    let weather_json = get_weather_json(api_key)?;
+    let args: Vec<String> = env::args().collect();
+
+    if args.len() < 2 {
+        panic!("No city provided as argument!");
+    }
+
+    let city = &args[1];
+
+    let weather_json = get_weather_json(api_key, city)?;
 
     let weather = parse_weather_json(weather_json)?;
 
@@ -26,12 +34,10 @@ fn get_weather_api_key() -> Result<String, Box<dyn Error>> {
     }
 }
 
-fn get_weather_json(api_key: String) -> Result<String, Box<dyn Error>> {
-    const CITY: &str = "Wrexham";
-
+fn get_weather_json(api_key: String, city: &String) -> Result<String, Box<dyn Error>> {
     let url = format!(
         "https://api.openweathermap.org/data/2.5/weather?q={}&appid={}&units=metric",
-        CITY, api_key
+        city, api_key
     );
 
     let response = reqwest::blocking::get(&url)?;
