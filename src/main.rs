@@ -34,7 +34,7 @@ fn get_weather_api_key() -> Result<String, Box<dyn Error>> {
     }
 }
 
-fn get_weather_json(api_key: String, city: &String) -> Result<String, Box<dyn Error>> {
+fn get_weather_json(api_key: String, city: &String) -> Result<String, reqwest::Error> {
     let url = format!(
         "https://api.openweathermap.org/data/2.5/weather?q={}&appid={}&units=metric",
         city, api_key
@@ -42,14 +42,14 @@ fn get_weather_json(api_key: String, city: &String) -> Result<String, Box<dyn Er
 
     let response = reqwest::blocking::get(&url)?;
 
-    if response.status().is_success() {
-        let json = response.text()?;
-        Ok(json)
-    } else {
-        Err(Box::new(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            "Failed to fetch weather data",
-        )))
+    let response = response.error_for_status();
+
+    match response {
+        Ok(response) => {
+            let json = response.text()?;
+            Ok(json)
+        }
+        Err(error) => Err(error),
     }
 }
 
