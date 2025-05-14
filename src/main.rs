@@ -27,10 +27,11 @@ fn get_weather_api_key() -> Result<String, Box<dyn Error>> {
 }
 
 fn get_weather_json(api_key: String) -> Result<String, Box<dyn Error>> {
-    let city = "Wrexham";
+    const CITY: &str = "Wrexham";
+
     let url = format!(
         "https://api.openweathermap.org/data/2.5/weather?q={}&appid={}&units=metric",
-        city, api_key
+        CITY, api_key
     );
 
     let response = reqwest::blocking::get(&url)?;
