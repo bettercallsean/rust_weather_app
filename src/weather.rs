@@ -19,8 +19,8 @@ pub struct Root {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Coord {
-    pub lon: i64,
-    pub lat: i64,
+    pub lon: f64,
+    pub lat: f64,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
