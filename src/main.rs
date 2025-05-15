@@ -42,9 +42,7 @@ fn get_weather_json(api_key: String, city: &String) -> Result<String, reqwest::E
 
     let response = reqwest::blocking::get(&url)?;
 
-    let response = response.error_for_status();
-
-    match response {
+    match response.error_for_status() {
         Ok(response) => {
             let json = response.text()?;
             Ok(json)
@@ -64,11 +62,26 @@ fn print_weather(weather: Root) {
 
     if let Some(weather_description) = weather.weather.first() {
         println!(
-            "{}: {}",
-            weather_description.main, weather_description.description
+            "{}: {} {}",
+            weather_description.main,
+            weather_description.description,
+            get_weather_emoji(&weather_description.main)
         );
     }
 
     println!("Current temp: {:.0}ºC", weather.main.temp);
     println!("Feels like: {:.0}ºC", weather.main.feels_like);
+}
+
+fn get_weather_emoji(weather_description: &str) -> &str {
+    match weather_description {
+        "Thunderstorm" => "⚡️",
+        "Drizzle" => "🌧️",
+        "Rain" => "☔️",
+        "Snow" => "❄️",
+        "Atmosphere" => "🌫️",
+        "Clear" => "☀️",
+        "Clouds" => "🌥️",
+        _ => "❓",
+    }
 }
