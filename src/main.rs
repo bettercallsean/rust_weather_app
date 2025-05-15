@@ -1,7 +1,7 @@
 mod weather;
 mod weather_description;
 
-use chrono::Utc;
+use chrono::Local;
 use std::env;
 use std::error::Error;
 use std::str::FromStr;
@@ -62,7 +62,7 @@ fn parse_weather_json(weather_json: String) -> Result<Weather, Box<dyn Error>> {
 
 fn print_weather(weather: Weather) {
     println!("Weather for {}", weather.name);
-    println!("{}", Utc::now().format("%d/%m/%y %H:%M"));
+    println!("{}", Local::now().format("%d/%m/%y %H:%M"));
 
     if let Some(weather_description) = weather.weather.first() {
         println!(
