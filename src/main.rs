@@ -61,6 +61,7 @@ fn parse_weather_json(weather_json: String) -> Result<Weather, Box<dyn Error>> {
 }
 
 fn print_weather(weather: Weather) {
+    println!("Weather for {}", weather.name);
     println!("{}", Utc::now().format("%d/%m/%y %H:%M"));
 
     if let Some(weather_description) = weather.weather.first() {
