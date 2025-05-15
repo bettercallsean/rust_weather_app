@@ -6,16 +6,12 @@ use std::env;
 use std::error::Error;
 use std::str::FromStr;
 
-pub fn get_weather(city: &String) -> Result<(), Box<dyn Error>> {
+pub fn get_weather_report(city: &String) -> Result<(), Box<dyn Error>> {
     let api_key = get_weather_api_key()?;
 
-    let location_json = get_city_location_json(&api_key, city)?;
+    let location = get_city_location(&api_key, city)?;
 
-    let location = parse_location_json(location_json)?;
-
-    let weather_json = get_weather_json(&api_key, &location)?;
-
-    let weather = parse_weather_json(weather_json)?;
+    let weather = get_weather(&api_key, &location)?;
 
     print_weather(weather);
 
@@ -31,7 +27,7 @@ fn get_weather_api_key() -> Result<String, Box<dyn Error>> {
     }
 }
 
-fn get_weather_json(api_key: &String, location: &Location) -> Result<String, reqwest::Error> {
+fn get_weather(api_key: &String, location: &Location) -> Result<Weather, Box<dyn Error>> {
     let url = format!(
         "https://api.openweathermap.org/data/2.5/weather?lon={}&lat={}&appid={}&units=metric",
         location.lon, location.lat, api_key
@@ -42,13 +38,14 @@ fn get_weather_json(api_key: &String, location: &Location) -> Result<String, req
     match response.error_for_status() {
         Ok(response) => {
             let json = response.text()?;
-            Ok(json)
+            let weather = parse_weather_json(json)?;
+            Ok(weather)
         }
-        Err(error) => Err(error),
+        Err(error) => Err(Box::new(error)),
     }
 }
 
-fn get_city_location_json(api_key: &String, city: &String) -> Result<String, reqwest::Error> {
+fn get_city_location(api_key: &String, city: &String) -> Result<Location, Box<dyn Error>> {
     let url = format!(
         "http://api.openweathermap.org/geo/1.0/direct?q={}&limit=1&&appid={}",
         city, api_key
@@ -59,9 +56,10 @@ fn get_city_location_json(api_key: &String, city: &String) -> Result<String, req
     match response.error_for_status() {
         Ok(response) => {
             let json = response.text()?;
-            Ok(json)
+            let location = parse_location_json(json)?;
+            Ok(location)
         }
-        Err(error) => Err(error),
+        Err(error) => Err(Box::new(error)),
     }
 }
 

@@ -15,7 +15,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let city = &args[1];
 
-    let _ = weather_service::get_weather(city);
+    let _ = weather_service::get_weather_report(city);
 
     Ok(())
 }
