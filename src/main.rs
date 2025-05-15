@@ -1,7 +1,9 @@
+mod location;
 mod weather;
 mod weather_description;
 
 use chrono::Local;
+use location::{Location, Locations};
 use std::env;
 use std::error::Error;
 use std::str::FromStr;
@@ -19,7 +21,11 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let city = &args[1];
 
-    let weather_json = get_weather_json(api_key, city)?;
+    let location_json = get_city_location_json(&api_key, city)?;
+
+    let location = parse_location_json(location_json)?;
+
+    let weather_json = get_weather_json(&api_key, &location)?;
 
     let weather = parse_weather_json(weather_json)?;
 
@@ -37,9 +43,26 @@ fn get_weather_api_key() -> Result<String, Box<dyn Error>> {
     }
 }
 
-fn get_weather_json(api_key: String, city: &String) -> Result<String, reqwest::Error> {
+fn get_weather_json(api_key: &String, location: &Location) -> Result<String, reqwest::Error> {
     let url = format!(
-        "https://api.openweathermap.org/data/2.5/weather?q={}&appid={}&units=metric",
+        "https://api.openweathermap.org/data/2.5/weather?lon={}&lat={}&appid={}&units=metric",
+        location.lon, location.lat, api_key
+    );
+
+    let response = reqwest::blocking::get(&url)?;
+
+    match response.error_for_status() {
+        Ok(response) => {
+            let json = response.text()?;
+            Ok(json)
+        }
+        Err(error) => Err(error),
+    }
+}
+
+fn get_city_location_json(api_key: &String, city: &String) -> Result<String, reqwest::Error> {
+    let url = format!(
+        "http://api.openweathermap.org/geo/1.0/direct?q={}&limit=1&&appid={}",
         city, api_key
     );
 
@@ -54,6 +77,15 @@ fn get_weather_json(api_key: String, city: &String) -> Result<String, reqwest::E
     }
 }
 
+fn parse_location_json(location_json: String) -> Result<Location, Box<dyn Error>> {
+    let locations: Locations = serde_json::from_str(&location_json)?;
+
+    match locations.first() {
+        Some(location) => Ok(location.to_owned()),
+        None => panic!("Location not found by Geolocation API!"),
+    }
+}
+
 fn parse_weather_json(weather_json: String) -> Result<Weather, Box<dyn Error>> {
     let weather: Weather = serde_json::from_str(&weather_json)?;
 
@@ -64,13 +96,13 @@ fn print_weather(weather: Weather) {
     println!("Weather for {}", weather.name);
     println!("{}", Local::now().format("%d/%m/%y %H:%M"));
 
-    if let Some(weather_description) = weather.weather.first() {
+    if let Some(weather_synopsis) = weather.weather.first() {
         println!(
             "{}: {} {}",
-            weather_description.main,
-            weather_description.description,
+            weather_synopsis.main,
+            weather_synopsis.description,
             get_weather_emoji(
-                WeatherDescription::from_str(&weather_description.main).unwrap_or_default()
+                WeatherDescription::from_str(&weather_synopsis.main).unwrap_or_default()
             )
         );
     }
