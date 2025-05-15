@@ -1,6 +1,6 @@
 mod enums;
 mod models;
-mod weather_service;
+mod services;
 
 use std::env;
 use std::error::Error;
@@ -14,7 +14,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let city = &args[1];
 
-    let _ = weather_service::get_weather(city);
+    let _ = services::weather_service::get_weather(city);
 
     Ok(())
 }
