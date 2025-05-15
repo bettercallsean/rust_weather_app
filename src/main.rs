@@ -1,9 +1,12 @@
 mod weather;
+mod weather_description;
 
 use chrono::Utc;
 use std::env;
 use std::error::Error;
-use weather::Root;
+use std::str::FromStr;
+use weather::Weather;
+use weather_description::WeatherDescription;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let api_key = get_weather_api_key()?;
@@ -51,13 +54,13 @@ fn get_weather_json(api_key: String, city: &String) -> Result<String, reqwest::E
     }
 }
 
-fn parse_weather_json(weather_json: String) -> Result<Root, Box<dyn Error>> {
-    let weather: Root = serde_json::from_str(&weather_json)?;
+fn parse_weather_json(weather_json: String) -> Result<Weather, Box<dyn Error>> {
+    let weather: Weather = serde_json::from_str(&weather_json)?;
 
     Ok(weather)
 }
 
-fn print_weather(weather: Root) {
+fn print_weather(weather: Weather) {
     println!("{}", Utc::now().format("%d/%m/%y %H:%M"));
 
     if let Some(weather_description) = weather.weather.first() {
@@ -65,7 +68,9 @@ fn print_weather(weather: Root) {
             "{}: {} {}",
             weather_description.main,
             weather_description.description,
-            get_weather_emoji(&weather_description.main)
+            get_weather_emoji(
+                WeatherDescription::from_str(&weather_description.main).unwrap_or_default()
+            )
         );
     }
 
@@ -73,15 +78,15 @@ fn print_weather(weather: Root) {
     println!("Feels like: {:.0}ºC", weather.main.feels_like);
 }
 
-fn get_weather_emoji(weather_description: &str) -> &str {
+fn get_weather_emoji<'a>(weather_description: WeatherDescription) -> &'a str {
     match weather_description {
-        "Thunderstorm" => "⚡️",
-        "Drizzle" => "🌧️",
-        "Rain" => "☔️",
-        "Snow" => "❄️",
-        "Atmosphere" => "🌫️",
-        "Clear" => "☀️",
-        "Clouds" => "🌥️",
-        _ => "❓",
+        WeatherDescription::Thunderstorm => "⚡️",
+        WeatherDescription::Drizzle => "🌧️",
+        WeatherDescription::Rain => "☔️",
+        WeatherDescription::Snow => "❄️",
+        WeatherDescription::Atmosphere => "🌫️",
+        WeatherDescription::Clear => "☀️",
+        WeatherDescription::Clouds => "🌥️",
+        WeatherDescription::Other => "❓",
     }
 }

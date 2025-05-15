@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Root {
+pub struct Weather {
     pub coord: Coord,
-    pub weather: Vec<Weather>,
+    pub weather: Vec<Synopsis>,
     pub base: String,
     pub main: Main,
     pub visibility: i64,
@@ -24,7 +24,7 @@ pub struct Coord {
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Weather {
+pub struct Synopsis {
     pub id: i64,
     pub main: String,
     pub description: String,
