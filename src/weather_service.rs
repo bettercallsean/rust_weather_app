@@ -1,14 +1,10 @@
-use crate::location;
-use crate::weather;
-use crate::weather_description;
-
+use crate::enums::weather_description::WeatherDescription;
+use crate::models::location::{Location, Locations};
+use crate::models::weather::Weather;
 use chrono::Local;
-use location::{Location, Locations};
 use std::env;
 use std::error::Error;
 use std::str::FromStr;
-use weather::Weather;
-use weather_description::WeatherDescription;
 
 pub fn get_weather(city: &String) -> Result<(), Box<dyn Error>> {
     let api_key = get_weather_api_key()?;

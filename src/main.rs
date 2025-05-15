@@ -1,6 +1,5 @@
-mod location;
-mod weather;
-mod weather_description;
+mod enums;
+mod models;
 mod weather_service;
 
 use std::env;
