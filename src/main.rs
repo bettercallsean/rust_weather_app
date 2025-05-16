@@ -6,7 +6,8 @@ use services::weather_service;
 use std::env;
 use std::error::Error;
 
-fn main() -> Result<(), Box<dyn Error>> {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();
 
     if args.len() < 2 {
@@ -15,7 +16,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let city = &args[1];
 
-    let _ = weather_service::get_weather_report(city);
+    let _ = weather_service::get_weather_report(city).await;
 
     Ok(())
 }

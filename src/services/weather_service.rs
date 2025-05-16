@@ -6,12 +6,12 @@ use std::env;
 use std::error::Error;
 use std::str::FromStr;
 
-pub fn get_weather_report(city: &String) -> Result<(), Box<dyn Error>> {
+pub async fn get_weather_report(city: &String) -> Result<(), Box<dyn Error>> {
     let api_key = get_weather_api_key()?;
 
-    let location = get_city_location(&api_key, city)?;
+    let location = get_city_location(&api_key, city).await?;
 
-    let weather = get_weather(&api_key, &location)?;
+    let weather = get_weather(&api_key, &location).await?;
 
     print_weather(weather);
 
@@ -27,17 +27,17 @@ fn get_weather_api_key() -> Result<String, Box<dyn Error>> {
     }
 }
 
-fn get_weather(api_key: &String, location: &Location) -> Result<Weather, Box<dyn Error>> {
+async fn get_weather(api_key: &String, location: &Location) -> Result<Weather, Box<dyn Error>> {
     let url = format!(
         "https://api.openweathermap.org/data/2.5/weather?lon={}&lat={}&appid={}&units=metric",
         location.lon, location.lat, api_key
     );
 
-    let response = reqwest::blocking::get(&url)?;
+    let response = reqwest::get(&url).await?;
 
     match response.error_for_status() {
         Ok(response) => {
-            let json = response.text()?;
+            let json = response.text().await?;
             let weather = parse_weather_json(json)?;
             Ok(weather)
         }
@@ -45,17 +45,17 @@ fn get_weather(api_key: &String, location: &Location) -> Result<Weather, Box<dyn
     }
 }
 
-fn get_city_location(api_key: &String, city: &String) -> Result<Location, Box<dyn Error>> {
+async fn get_city_location(api_key: &String, city: &String) -> Result<Location, Box<dyn Error>> {
     let url = format!(
         "http://api.openweathermap.org/geo/1.0/direct?q={}&limit=1&&appid={}",
         city, api_key
     );
 
-    let response = reqwest::blocking::get(&url)?;
+    let response = reqwest::get(&url).await?;
 
     match response.error_for_status() {
         Ok(response) => {
-            let json = response.text()?;
+            let json = response.text().await?;
             let location = parse_location_json(json)?;
             Ok(location)
         }
