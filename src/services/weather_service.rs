@@ -2,9 +2,9 @@ use crate::enums::weather_description::WeatherDescription;
 use crate::models::location::{Location, Locations};
 use crate::models::weather::Weather;
 use chrono::Local;
-use std::env;
 use std::error::Error;
 use std::str::FromStr;
+use std::{env, process};
 
 pub async fn get_weather_report(city: &String) -> Result<(), Box<dyn Error>> {
     let api_key = get_weather_api_key()?;
@@ -68,7 +68,10 @@ fn parse_location_json(location_json: String) -> Result<Location, Box<dyn Error>
 
     match locations.first() {
         Some(location) => Ok(location.to_owned()),
-        None => panic!("Location not found by Geolocation API!"),
+        None => {
+            eprintln!("Location not found by Geolocation API!");
+            process::exit(1);
+        }
     }
 }
 
