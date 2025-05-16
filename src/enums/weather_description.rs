@@ -18,14 +18,14 @@ impl FromStr for WeatherDescription {
 
     fn from_str(input: &str) -> Result<WeatherDescription, Self::Err> {
         match input {
-            "Thunderstorm" => Ok(WeatherDescription::Thunderstorm),
-            "Drizzle" => Ok(WeatherDescription::Drizzle),
-            "Rain" => Ok(WeatherDescription::Rain),
-            "Snow" => Ok(WeatherDescription::Snow),
-            "Atmosphere" => Ok(WeatherDescription::Atmosphere),
-            "Clear" => Ok(WeatherDescription::Clear),
-            "Clouds" => Ok(WeatherDescription::Clouds),
-            _ => Ok(WeatherDescription::Other),
+            "Thunderstorm" => Ok(Self::Thunderstorm),
+            "Drizzle" => Ok(Self::Drizzle),
+            "Rain" => Ok(Self::Rain),
+            "Snow" => Ok(Self::Snow),
+            "Atmosphere" => Ok(Self::Atmosphere),
+            "Clear" => Ok(Self::Clear),
+            "Clouds" => Ok(Self::Clouds),
+            _ => Ok(Self::Other),
         }
     }
 }
