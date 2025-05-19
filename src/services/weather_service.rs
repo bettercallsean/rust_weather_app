@@ -86,29 +86,16 @@ fn print_weather(weather: Weather) {
     println!("{}", Local::now().format("%d/%m/%y %H:%M"));
 
     if let Some(weather_synopsis) = weather.weather.first() {
+        let description = WeatherDescription::from_str(&weather_synopsis.main).unwrap_or_default();
+
         println!(
             "{}: {} {}",
-            weather_synopsis.main,
+            description,
             weather_synopsis.description,
-            get_weather_emoji(
-                WeatherDescription::from_str(&weather_synopsis.main).unwrap_or_default()
-            )
+            description.get_emoji()
         );
     }
 
     println!("Current temp: {:.0}ºC", weather.main.temp);
     println!("Feels like: {:.0}ºC", weather.main.feels_like);
-}
-
-fn get_weather_emoji<'a>(weather_description: WeatherDescription) -> &'a str {
-    match weather_description {
-        WeatherDescription::Thunderstorm => "⚡️",
-        WeatherDescription::Drizzle => "🌧️",
-        WeatherDescription::Rain => "☔️",
-        WeatherDescription::Snow => "❄️",
-        WeatherDescription::Atmosphere => "🌫️",
-        WeatherDescription::Clear => "☀️",
-        WeatherDescription::Clouds => "🌥️",
-        WeatherDescription::Other => "❓",
-    }
 }
