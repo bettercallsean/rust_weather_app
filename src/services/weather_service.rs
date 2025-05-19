@@ -1,6 +1,6 @@
-use crate::enums::weather_synopsis::{Synopsis, WeatherSynopsis};
 use crate::models::location::{Location, Locations};
 use crate::models::weather::Weather;
+use crate::models::weather_synopsis::{Synopsis, WeatherSynopsis};
 use chrono::Local;
 use std::error::Error;
 use std::str::FromStr;
