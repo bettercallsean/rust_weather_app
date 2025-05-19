@@ -1,1 +1,1 @@
-pub mod weather_description;
+pub mod weather_synopsis;

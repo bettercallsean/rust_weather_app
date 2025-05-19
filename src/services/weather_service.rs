@@ -1,4 +1,4 @@
-use crate::enums::weather_description::WeatherDescription;
+use crate::enums::weather_synopsis::{Synopsis, WeatherSynopsis};
 use crate::models::location::{Location, Locations};
 use crate::models::weather::Weather;
 use chrono::Local;
@@ -86,13 +86,16 @@ fn print_weather(weather: Weather) {
     println!("{}", Local::now().format("%d/%m/%y %H:%M"));
 
     if let Some(weather_synopsis) = weather.weather.first() {
-        let description = WeatherDescription::from_str(&weather_synopsis.main).unwrap_or_default();
+        let weather_synopsis = WeatherSynopsis {
+            synopsis: Synopsis::from_str(&weather_synopsis.main).unwrap_or_default(),
+            description: weather_synopsis.description.clone(),
+        };
 
         println!(
             "{}: {} {}",
-            description,
+            weather_synopsis.synopsis,
             weather_synopsis.description,
-            description.get_emoji()
+            weather_synopsis.synopsis.get_emoji()
         );
     }
 
