@@ -1,9 +1,7 @@
 use crate::models::location::{Location, Locations};
 use crate::models::weather::Weather;
-use crate::models::weather_synopsis::{Synopsis, WeatherSynopsis};
 use chrono::Local;
 use std::error::Error;
-use std::str::FromStr;
 use std::{env, process};
 
 pub async fn get_weather_report(city: &String) -> Result<(), Box<dyn Error>> {
@@ -85,12 +83,7 @@ fn print_weather(weather: Weather) {
     println!("Weather for {}", weather.name);
     println!("{}", Local::now().format("%d/%m/%y %H:%M"));
 
-    if let Some(weather_synopsis) = weather.weather.first() {
-        let weather_synopsis = WeatherSynopsis {
-            synopsis: Synopsis::from_str(&weather_synopsis.main).unwrap_or_default(),
-            description: weather_synopsis.description.clone(),
-        };
-
+    if let Some(weather_synopsis) = weather.synopsis.first() {
         println!(
             "{}: {} {}",
             weather_synopsis.synopsis,
