@@ -6,6 +6,8 @@ use std::fs::{self, File};
 use std::io::Write;
 use std::{env, process};
 
+const WEATHER_JSON_FILE: &str = "weather.json";
+
 pub async fn get_weather_forecast(city: &str) -> Result<(), Box<dyn Error>> {
     let weather = match get_stored_weather_forecast() {
         Ok(weather) => {
@@ -127,14 +129,14 @@ fn print_weather(weather: &Weather) {
 
 fn store_weather_forecast(weather: &Weather) -> std::io::Result<()> {
     let weather_json = serde_json::to_string(weather)?;
-    let mut file = File::create("weather.json")?;
+    let mut file = File::create(WEATHER_JSON_FILE)?;
     write!(file, "{}", weather_json)?;
 
     Ok(())
 }
 
 fn get_stored_weather_forecast() -> Result<Weather, Box<dyn Error>> {
-    let weather_json = fs::read_to_string("weather.json")?;
+    let weather_json = fs::read_to_string(WEATHER_JSON_FILE)?;
     let weather: Weather = serde_json::from_str(&weather_json)?;
 
     Ok(weather)
