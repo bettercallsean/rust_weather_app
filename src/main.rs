@@ -16,7 +16,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let city = &args[1];
 
-    if let Err(e) = weather_service::get_weather_report(city).await {
+    if let Err(e) = weather_service::get_weather_forecast(city).await {
         eprintln!("Failed to get weather");
         Err(e)
     } else {

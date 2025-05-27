@@ -6,7 +6,7 @@ use std::fs::{self, File};
 use std::io::Write;
 use std::{env, process};
 
-pub async fn get_weather_report(city: &str) -> Result<(), Box<dyn Error>> {
+pub async fn get_weather_forecast(city: &str) -> Result<(), Box<dyn Error>> {
     let weather = match get_stored_weather_forecast() {
         Ok(weather) => {
             let current_time = chrono::Local::now().timestamp();
