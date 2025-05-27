@@ -6,7 +6,7 @@ use std::fs::{self, File};
 use std::io::Write;
 use std::{env, process};
 
-pub async fn get_weather_report(city: &String) -> Result<(), Box<dyn Error>> {
+pub async fn get_weather_report(city: &str) -> Result<(), Box<dyn Error>> {
     let weather = match get_stored_weather_forecast() {
         Ok(mut weather) => {
             let current_time = chrono::Local::now().timestamp();
@@ -27,7 +27,7 @@ pub async fn get_weather_report(city: &String) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-async fn get_latest_weather_forecast(city: &String) -> Result<Weather, Box<dyn Error>> {
+async fn get_latest_weather_forecast(city: &str) -> Result<Weather, Box<dyn Error>> {
     let api_key = get_weather_api_key()?;
     let location = get_city_location(&api_key, city).await?;
     let weather = get_new_weather_forecast(&api_key, &location).await?;
@@ -45,7 +45,7 @@ fn get_weather_api_key() -> Result<String, Box<dyn Error>> {
 }
 
 async fn get_new_weather_forecast(
-    api_key: &String,
+    api_key: &str,
     location: &Location,
 ) -> Result<Weather, Box<dyn Error>> {
     let url = format!(
@@ -65,7 +65,7 @@ async fn get_new_weather_forecast(
     }
 }
 
-async fn get_city_location(api_key: &String, city: &String) -> Result<Location, Box<dyn Error>> {
+async fn get_city_location(api_key: &str, city: &str) -> Result<Location, Box<dyn Error>> {
     let url = format!(
         "http://api.openweathermap.org/geo/1.0/direct?q={}&limit=1&&appid={}",
         city, api_key
@@ -76,15 +76,15 @@ async fn get_city_location(api_key: &String, city: &String) -> Result<Location, 
     match response.error_for_status() {
         Ok(response) => {
             let json = response.text().await?;
-            let location = parse_location_json(json)?;
+            let location = parse_location_json(json.as_str())?;
             Ok(location)
         }
         Err(error) => Err(Box::new(error)),
     }
 }
 
-fn parse_location_json(location_json: String) -> Result<Location, Box<dyn Error>> {
-    let locations: Locations = serde_json::from_str(&location_json)?;
+fn parse_location_json(location_json: &str) -> Result<Location, Box<dyn Error>> {
+    let locations: Locations = serde_json::from_str(location_json)?;
 
     match locations.first() {
         Some(location) => Ok(location.to_owned()),
