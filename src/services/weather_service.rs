@@ -1,6 +1,6 @@
 use crate::models::location::{Location, Locations};
 use crate::models::weather::Weather;
-use chrono::Local;
+use chrono::{DateTime, Local};
 use std::error::Error;
 use std::fs::{self, File};
 use std::io::Write;
@@ -103,7 +103,14 @@ fn parse_weather_json(weather_json: &str) -> Result<Weather, Box<dyn Error>> {
 
 fn print_weather(weather: &Weather) {
     println!("Weather for {}", weather.name);
-    println!("{}", Local::now().format("%d/%m/%y %H:%M"));
+    let forecast_time = match DateTime::from_timestamp(weather.dt, 0) {
+        Some(time) => <DateTime<Local>>::from(time),
+        None => {
+            eprintln!("Failed to parse stored forecast time");
+            Local::now()
+        }
+    };
+    println!("Forecast date: {}", forecast_time.format("%d/%m/%y %H:%M"));
 
     if let Some(weather_synopsis) = weather.synopsis.first() {
         println!(
