@@ -67,7 +67,7 @@ async fn get_new_weather_forecast(
 
 async fn get_city_location(api_key: &str, city: &str) -> Result<Location, Box<dyn Error>> {
     let url = format!(
-        "http://api.openweathermap.org/geo/1.0/direct?q={}&limit=1&&appid={}",
+        "https://api.openweathermap.org/geo/1.0/direct?q={}&limit=1&&appid={}",
         city, api_key
     );
 
