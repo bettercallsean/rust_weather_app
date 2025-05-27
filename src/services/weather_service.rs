@@ -8,14 +8,14 @@ use std::{env, process};
 
 pub async fn get_weather_report(city: &str) -> Result<(), Box<dyn Error>> {
     let weather = match get_stored_weather_forecast() {
-        Ok(mut weather) => {
+        Ok(weather) => {
             let current_time = chrono::Local::now().timestamp();
 
             if weather.city != *city || ((current_time - weather.forecast_date) / 60) >= 10 {
-                weather = get_latest_weather_forecast(city).await?;
+                get_latest_weather_forecast(city).await?
+            } else {
+                weather
             }
-
-            weather
         }
         Err(_) => get_latest_weather_forecast(city).await?,
     };
