@@ -7,27 +7,27 @@ use std::io::Write;
 use std::{env, process};
 
 pub async fn get_weather_report(city: &String) -> Result<(), Box<dyn Error>> {
-    let weather = match get_stored_weather() {
-        Ok(weather) => {
+    let weather = match get_stored_weather_forecast() {
+        Ok(mut weather) => {
             let current_time = chrono::Local::now().timestamp();
 
-            if weather.name != *city || ((current_time - weather.dt) / 60) >= 10 {
-                get_weather(city).await?;
+            if weather.city != *city || ((current_time - weather.forecast_date) / 60) >= 10 {
+                weather = get_latest_weather_forecast(city).await?;
             }
 
             weather
         }
-        Err(_) => get_weather(city).await?,
+        Err(_) => get_latest_weather_forecast(city).await?,
     };
 
     print_weather(&weather);
 
-    store_weather_result(&weather)?;
+    store_weather_forecast(&weather)?;
 
     Ok(())
 }
 
-async fn get_weather(city: &String) -> Result<Weather, Box<dyn Error>> {
+async fn get_latest_weather_forecast(city: &String) -> Result<Weather, Box<dyn Error>> {
     let api_key = get_weather_api_key()?;
     let location = get_city_location(&api_key, city).await?;
     let weather = get_new_weather_forecast(&api_key, &location).await?;
@@ -58,7 +58,7 @@ async fn get_new_weather_forecast(
     match response.error_for_status() {
         Ok(response) => {
             let json = response.text().await?;
-            let weather = parse_weather_json(json.as_str())?;
+            let weather = parse_weather_forecast_json(json.as_str())?;
             Ok(weather)
         }
         Err(error) => Err(Box::new(error)),
@@ -95,15 +95,15 @@ fn parse_location_json(location_json: String) -> Result<Location, Box<dyn Error>
     }
 }
 
-fn parse_weather_json(weather_json: &str) -> Result<Weather, Box<dyn Error>> {
+fn parse_weather_forecast_json(weather_json: &str) -> Result<Weather, Box<dyn Error>> {
     let weather: Weather = serde_json::from_str(weather_json)?;
 
     Ok(weather)
 }
 
 fn print_weather(weather: &Weather) {
-    println!("Weather for {}", weather.name);
-    let forecast_time = match DateTime::from_timestamp(weather.dt, 0) {
+    println!("Weather for {}", weather.city);
+    let forecast_time = match DateTime::from_timestamp(weather.forecast_date, 0) {
         Some(time) => <DateTime<Local>>::from(time),
         None => {
             eprintln!("Failed to parse stored forecast time");
@@ -125,7 +125,7 @@ fn print_weather(weather: &Weather) {
     println!("Feels like: {:.0}ºC", weather.temperature.feels_like);
 }
 
-fn store_weather_result(weather: &Weather) -> std::io::Result<()> {
+fn store_weather_forecast(weather: &Weather) -> std::io::Result<()> {
     let weather_json = serde_json::to_string(weather)?;
     let mut file = File::create("weather.json")?;
     write!(file, "{}", weather_json)?;
@@ -133,7 +133,7 @@ fn store_weather_result(weather: &Weather) -> std::io::Result<()> {
     Ok(())
 }
 
-fn get_stored_weather() -> Result<Weather, Box<dyn Error>> {
+fn get_stored_weather_forecast() -> Result<Weather, Box<dyn Error>> {
     let weather_json = fs::read_to_string("weather.json")?;
     let weather: Weather = serde_json::from_str(&weather_json)?;
 

@@ -24,10 +24,12 @@ pub struct Weather {
     pub visibility: i64,
     pub wind: Wind,
     pub clouds: Clouds,
-    pub dt: i64,
+    #[serde(rename = "dt")]
+    pub forecast_date: i64,
     pub sys: Sys,
     pub timezone: i64,
     pub id: i64,
-    pub name: String,
+    #[serde(rename = "name")]
+    pub city: String,
     pub cod: i64,
 }
