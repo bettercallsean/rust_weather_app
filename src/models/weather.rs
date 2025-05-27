@@ -18,7 +18,6 @@ pub struct Weather {
     pub coord: Coord,
     #[serde(rename = "weather")]
     pub synopsis: Vec<WeatherSynopsis>,
-    pub base: String,
     #[serde(rename = "main")]
     pub temperature: Temperature,
     pub visibility: i64,
@@ -31,5 +30,4 @@ pub struct Weather {
     pub id: i64,
     #[serde(rename = "name")]
     pub city: String,
-    pub cod: i64,
 }
