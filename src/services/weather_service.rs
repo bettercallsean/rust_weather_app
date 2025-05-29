@@ -114,12 +114,12 @@ fn print_weather(weather: &Weather) {
     };
     println!("Forecast date: {}", forecast_time.format("%d/%m/%y %H:%M"));
 
-    if let Some(weather_synopsis) = weather.synopsis.first() {
+    for synopsis in weather.synopsis.iter() {
         println!(
             "{}: {} {}",
-            weather_synopsis.synopsis,
-            weather_synopsis.description,
-            weather_synopsis.synopsis.get_emoji()
+            synopsis.synopsis,
+            synopsis.description,
+            synopsis.synopsis.get_emoji()
         );
     }
 
