@@ -1,6 +1,5 @@
-use std::{fmt::Display, str::FromStr};
-
 use serde::{Deserialize, Serialize};
+use std::{fmt::Display, str::FromStr};
 
 const THUNDERSTORM: &str = "Thunderstorm";
 const DRIZZLE: &str = "Drizzle";
