@@ -5,6 +5,7 @@ use std::error::Error;
 use std::fs::{self, File};
 use std::io::Write;
 use std::{env, process};
+use country_emoji::flag;
 
 const WEATHER_JSON_FILE: &str = "weather.json";
 
@@ -104,7 +105,9 @@ fn parse_weather_forecast_json(weather_json: &str) -> Result<Weather, Box<dyn Er
 }
 
 fn print_weather(weather: &Weather) {
-    println!("Weather for {}", weather.city);
+    let flag = flag(&weather.sys.country).unwrap_or_else(|| "".to_string());
+
+    println!("Weather for {}{}", weather.city, flag);
     let forecast_time = match DateTime::from_timestamp(weather.forecast_date, 0) {
         Some(time) => <DateTime<Local>>::from(time),
         None => {
